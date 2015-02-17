@@ -29,7 +29,7 @@ Full example:
      :free-time     (bb/warn-level 10 100) ; <- normal if less than 10ms
      :work-as-usual (bb/rev-warn-level 100 10) ; <- normal if more than 100 critical <10
      :total         (bb/warn-level 100 500) ; <- 0..100 normal, 0..500 warn, >500 critical
-     :nb            (bb/rev-warn-level 5 1) <- less than 1 critical, less than 5 warn
+     :nb            (bb/rev-warn-level 5 1) ; <- less than 1 critical, less than 5 warn
      }
     nb-ms-metrics
     riemann-host
@@ -76,7 +76,7 @@ That will send data to riemann every nb-ms-metrics ms.
      :free-time     (bb/warn-level 10 100) ; <- normal if less than 10ms
      :work-as-usual (bb/rev-warn-level 100 10) ; <- normal if more than 100 critical <10
      :total         (bb/warn-level 100 500) ; <- 0..100 normal, 0..500 warn, >500 critical
-     :nb            (bb/rev-warn-level 5 1) <- less than 1 critical, less than 5 warn
+     :nb            (bb/rev-warn-level 5 1) ; <- less than 1 critical, less than 5 warn
      }
     nb-ms-metrics
     riemann-host
