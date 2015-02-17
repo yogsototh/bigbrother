@@ -15,7 +15,7 @@
 ;; Atoms
 (def pool (atom nil)) ;; pool for async
 (def default-map (atom #{}))
-(def riemann-default (atom nil))
+(def riemann-conf (atom nil))
 (def riemann-conn (atom nil))
 (def riemann-service (atom "supercell"))
 (def level-by-key (atom nil))
@@ -76,7 +76,7 @@
         metric-data (into
                      {:service @riemann-service
                       :state "ok"}
-                     @riemann-default)
+                     @riemann-conf)
         events (remove nil? (map to-riemann-event result-map))
         ]
     (when @riemann-conn
