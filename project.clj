@@ -1,4 +1,4 @@
-(defproject bigbrother "0.1.1-SNAPSHOT"
+(defproject bigbrother "0.1.1"
   :description "Periodically send metrics"
   :url "http://github.com/yogsototh/bigbrother"
   :license {:name "MIT"
