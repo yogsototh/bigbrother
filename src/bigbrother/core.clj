@@ -66,7 +66,7 @@
   (when (number? v)
     (let [lvl-fn (get @level-by-key k)
           level  (if lvl-fn (lvl-fn v) "ok")]
-      {:service (str @riemann-service " " (name k) (subs (str k) 1))
+      {:service (str @riemann-service " " (name k))
        :state level 
        :metric v})))
 
