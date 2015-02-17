@@ -67,18 +67,15 @@
   (when (number? v)
     (let [lvl-fn (get @level-by-key k)
           level  (if lvl-fn (lvl-fn v) "ok")]
-      {:service (str @riemann-service " " (name k))
-       :state level 
-       :metric v})))
+      (into
+        @riemann-conf
+        {:service (str @riemann-service " " (name k))
+         :state level 
+         :metric v}))))
 
 (defn send-to-riemann [m]
   (let [result-map (into @default-map m)
-        metric-data (into
-                     {:service @riemann-service
-                      :state "ok"}
-                     @riemann-conf)
-        events (remove nil? (map to-riemann-event result-map))
-        ]
+        events (remove nil? (map to-riemann-event result-map))]
     (when @riemann-conn
       (r/send-events @riemann-conn events))))
 
