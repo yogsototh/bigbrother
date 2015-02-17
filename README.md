@@ -33,7 +33,8 @@ Full example:
      }
     nb-ms-metrics
     riemann-host
-    riemann-service)
+    riemann-service
+    {:host "My-Custom-Name"})
 
 ;; If you log metrics not declared in init-metrics, they will show as always "ok"
 

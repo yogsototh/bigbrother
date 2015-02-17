@@ -15,6 +15,7 @@
 ;; Atoms
 (def pool (atom nil)) ;; pool for async
 (def default-map (atom #{}))
+(def riemann-default (atom nil))
 (def riemann-conn (atom nil))
 (def riemann-service (atom "supercell"))
 (def level-by-key (atom nil))
@@ -72,8 +73,10 @@
 
 (defn send-to-riemann [m]
   (let [result-map (into @default-map m)
-        metric-data {:service @riemann-service
-                     :state "ok"}
+        metric-data (into
+                     {:service @riemann-service
+                      :state "ok"}
+                     @riemann-default)
         events (remove nil? (map to-riemann-event result-map))
         ]
     (when @riemann-conn
@@ -114,12 +117,13 @@
   "## init-metrics
 
     init-map :: Map Keyword (v -> ERROR_LEVEL)"
-  [init-map nb-ms-metrics riemann-host riemann-service-name]
+  [init-map nb-ms-metrics riemann-host riemann-service-name riemann-default]
   (reset! default-map (reduce into {}
                               (map (fn [k] {k -1} )
                                    (conj (keys init-map) :total))))
   (reset! level-by-key init-map)
   (reset! pool (mk-pool))
+  (reset! riemann-conf riemann-default)
   (reset! riemann-service riemann-service-name)
   (when riemann-host
     (reset! riemann-conn (r/tcp-client {:host riemann-host})))
