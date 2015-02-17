@@ -68,7 +68,7 @@ The `init-metrics` function takes:
 
 That will send data to riemann every nb-ms-metrics ms.
 
-~~~
+~~~ {.clojure}
 (bb/init-metrics
     {:read-book     (bb/warn-level 10 100) ; <- less than 10ms is ok
      :write-notes   (bb/warn-level 10 100) ; <- warn between 10ms and 100ms
@@ -85,7 +85,7 @@ That will send data to riemann every nb-ms-metrics ms.
 
 ### Timers
 
-~~~
+~~~ {.clojure}
 (do
     (action)
     (bb/log-time :action))
@@ -94,7 +94,7 @@ That will send data to riemann every nb-ms-metrics ms.
 Will tell big brother that the action :action finished.
 Generally you use timers like this:
 
-~~~
+~~~ {.clojure}
 (do
     (bb/big-brother-is-watching-you)
     (action1)
@@ -117,7 +117,7 @@ big loop.
 
 Counter can be called:
 
-~~~
+~~~ {.clojure}
 (do
   (bb/log-counter :foo)
   (bb/log-counter :bar 3))
@@ -133,7 +133,7 @@ The main difference is that there is no notion of increment.
 You must always provide a value for a metrics.
 The resume will contains its mean normalized by second.
 
-~~~
+~~~ {.clojure}
 (do
     (bb/log-metric :foo 0.5)
     (bb/log-metric :foo 2.5)
@@ -147,7 +147,7 @@ In the resume you'll get `{:foo 2.0}` (`(0.5 + 2.5 + 3)/3`).
 
 Sometime you might want to get the maximum of some values during an interval of time.
 
-~~~
+~~~ {.clojure}
 (do
   (bb/log-mmetric :foo 5)
   (bb/log-mmetric :foo 1)
@@ -160,5 +160,4 @@ That will display `{:foo 5}` in the resume.
 
 Copyright © 2015 Yann Esposito
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the MIT License
