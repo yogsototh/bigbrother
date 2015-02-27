@@ -11,21 +11,22 @@
   (do
     (reset-all-atoms!)
     ;; first loop
-    (telescreen-on)
-    (Thread/sleep 30)
-    (log-time :x1)
-    (Thread/sleep 30)
-    (log-time :x2)
-    (Thread/sleep 30)
-    (log-time :end)
-    (telescreen-off)
-    ;; second loop
-    (log-time :start)
-    (Thread/sleep 30)
-    (log-time :x2)
-    (Thread/sleep 30)
-    (log-time :end)
-    (telescreen-off)
+    (let [session (telescreen-on)]
+      (Thread/sleep session 30)
+      (log-time session :x1)
+      (Thread/sleep session 30)
+      (log-time session :x2)
+      (Thread/sleep session 30)
+      (log-time session :end)
+      (telescreen-off session)
+      ;; second loop
+      (log-time session :start)
+      (Thread/sleep 30)
+      (log-time session :x2)
+      (Thread/sleep 30)
+      (log-time session :end)
+      (telescreen-off session)
+      (end-session! session))
     (let [result (resume-map 1000)]
       (is (contains? result :nb))
       (is (contains? result :x1))
@@ -100,9 +101,12 @@
                            (gen/vector gen/keyword))]
    (do
      (reset-all-atoms!)
-     (doall (map (fn [a] (do (log-time a) (Thread/sleep 10)))
-                 actions))
-     (timer-loop-finished))
+     (let [session (telescreen-on)]
+
+       (doall (map (fn [a] (do (log-time session a) (Thread/sleep 10)))
+                   actions))
+       (timer-loop-finished session)
+       (end-session! session)))
    (let [result (resume-map 1000)]
      (every? #(contains? result %) (rest actions)))))
 
@@ -113,8 +117,10 @@
                            (gen/vector gen/keyword))]
    (do
      (reset-all-atoms!)
-     (doall (map (fn [a] (do (log-time a) (Thread/sleep 10)))
-                 actions))
-     (timer-loop-finished))
+     (let [session (telescreen-on)]
+       (doall (map (fn [a] (do (log-time session a) (Thread/sleep 10)))
+                   actions))
+       (timer-loop-finished session)
+       (end-session! session)))
    (let [result (resume-map 1000)]
      (every? #(>= (:total result) (get result %)) (rest actions)))))

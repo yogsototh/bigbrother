@@ -42,20 +42,21 @@ Full example:
 
 (defn function-called-frequently
     []
-    (bb/big-brother-is-watching-you) ; <-- you must start the timer
-    (when (has-book?)
-        (read-book) ; <-- do your action
-        (bb/log-time :read-book) ; <-- tell the timer you've done something
-        (bb/log-counter :book) ; <-- increment the counter :book
-        )
-    (write-notes)
-    (bb/log-time :write-notes)
-    (let [time-felt-free (feel-free)]
-        (bb/log-time :feel-free)
-        (bb/log-mmetric :freetime time-felt-free))
-    (work-as-usual)
-    (bb/log-time :work-as-usual)
-    (bb/telescreen-off)) ; <-- end the timer loop to flush times.
+    (let [session (bb/big-brother-is-watching-you)] ; <-- you must start the timer
+      (when (has-book?)
+          (read-book) ; <-- do your action
+          (bb/log-time session :read-book) ; <-- tell the timer you've done something
+          (bb/log-counter :book) ; <-- increment the counter :book
+          )
+      (write-notes)
+      (bb/log-time session :write-notes)
+      (let [time-felt-free (feel-free)]
+          (bb/log-time session :feel-free)
+          (bb/log-mmetric :freetime time-felt-free))
+      (work-as-usual)
+      (bb/log-time session :work-as-usual)
+      (bb/telescreen-off session) ; <-- end the timer loop to flush times.
+      (bb/end-session! session)) ; <-- end this session
 ~~~
 
 ### Init
@@ -89,7 +90,7 @@ That will send data to riemann every nb-ms-metrics ms.
 ~~~ {.clojure}
 (do
     (action)
-    (bb/log-time :action))
+    (bb/log-time session :action))
 ~~~
 
 Will tell big brother that the action :action finished.
@@ -97,16 +98,17 @@ Generally you use timers like this:
 
 ~~~ {.clojure}
 (do
-    (bb/big-brother-is-watching-you)
-    (action1)
-    (bb/log-time :action1)
-    (action1)
-    (bb/log-time :action1)
-    (bb/telescreen-off))
+    (let [session (bb/big-brother-is-watching-you)]
+      (action1)
+      (bb/log-time session :action1)
+      (action1)
+      (bb/log-time session :action1)
+      (bb/telescreen-off session)
+      (bb/end-session! session))
 ~~~
 
 You declare a start time which will start the chrono.
-Then each time you decalare a `log-time` it will add the time taken to the action name.
+Then each time you declare a `log-time` it will add the time taken to the action name.
 
 Once you finished your course of action you declare the timer-loop as finished.
 And you stop the chrono up until the next `(bb/big-brother-is-watching-you)`.

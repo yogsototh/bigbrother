@@ -21,23 +21,38 @@
 (def level-by-key (atom nil))
 
 (def n (atom 0))      ;; a number
+(def session (atom 0)) ;; a simple session number
 
 (def log-time timer/log-time)
 (def log-counter counter/log-counter)
 (def log-metric metrics/log-metric)
 (def log-mmetric max-metrics/log-mmetric)
 
-(defn timer-loop-finished []
-  ;; increment the number of loop
-  (swap! n inc)
-  (timer/finish-timer-loop)
-  (max-metrics/loop-finished)
-  (metrics/loop-finished)
-  (counter/loop-finished))
+(defn timer-loop-finished
+  ([]
+   ;; increment the number of loop
+   (swap! n inc)
+   (max-metrics/loop-finished)
+   (metrics/loop-finished)
+   (counter/loop-finished))
+  ([session]
+   ;; increment the number of loop
+   (swap! n inc)
+   (timer/finish-timer-loop session)
+   (max-metrics/loop-finished)
+   (metrics/loop-finished)
+   (counter/loop-finished)))
+
+(defn end-session! [session]
+  (timer/end-session! session))
+
+(defn new-session! [] (swap! session inc) @session)
 
 ;; ---- aliases
 (defn big-brother-is-watching-you "Starting the timer" []
-  (timer/log-time :start))
+  (let [session (new-session!)]
+    (timer/log-time session :start)
+    session))
 (def telescreen-on "Starting the timer" big-brother-is-watching-you)
 
 (def welcome-in-miniluv "End the timer chrono" timer-loop-finished)
@@ -88,7 +103,7 @@
   (reset! n 0))
 
 (defn reset-all-atoms! []
-  (reset! timer/times [])
+  (reset! timer/times {})
   (reset! metrics/metrics {})
   (reset! max-metrics/mmetrics {})
   (reset! counter/counters {})

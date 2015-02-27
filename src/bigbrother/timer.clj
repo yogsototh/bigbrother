@@ -29,20 +29,18 @@
                         (/ (ts-timespent v)
                            (ts-nb v))}) st)))
 ;; timers atoms
-(def times (atom [])) ;; timestamps
+(def times (atom {})) ;; {session [timestamps]}
 (def sumtimes (atom empty-sumtime)) ;; time spent by type
 
 ;; Timer
-(defn- set-value! [k v] (swap! times conj [k v]))
+(defn- set-value! [session k v]
+  (let [update-one-raw #(if (nil? %) [[k v]] (conj % [k v]))]
+    (swap! times #(update-in % [session] update-one-raw))))
+
 (defn log-time
   "declare the action named `k` finished"
-  [k]
-  (set-value! k (System/nanoTime)))
-(defn log-time->
-  "declare the action named `k` finished and returned object `x`"
-  [x k]
-  (log-time k)
-  x)
+  [session k]
+  (set-value! session k (System/nanoTime)))
 
 (defn- show-one-step
   "get time spent during one step"
@@ -70,14 +68,18 @@
   [times-array]
   (fmap-sumtimes #(float (/ % 1000000)) times-array))
 
-(defn finish-timer-loop []
+(defn finish-timer-loop [session]
   ;; Convert actual timestamps to sumtimes and aggregate them
-  (if (> (count @times) 1)
-    (let [difftime (timespent @times)
-          total    (total-time @times)
-          res      (to-milliseconds (conj difftime [:total [total 1]]))]
-      (swap! sumtimes add-sumtimes res)))
-  (reset! times []))
+  (let [ts (get @times session)]
+    (if (> (count ts) 1)
+      (let [difftime (timespent ts)
+            total    (total-time ts)
+            res      (to-milliseconds (conj difftime [:total [total 1]]))]
+        (swap! sumtimes add-sumtimes res))))
+  (swap! times assoc session []))
+
+(defn end-session! [session]
+  (swap! times dissoc session))
 
 (defn reset-acc! []
   (reset! sumtimes empty-sumtime))
