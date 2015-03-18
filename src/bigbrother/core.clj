@@ -109,14 +109,20 @@ end
          :state level
          :metric v}))))
 
+(defmacro with-timeout [millis & body]
+  `(let [future# (future ~@body)]
+     (try
+       (.get future# ~millis java.util.concurrent.TimeUnit/MILLISECONDS)
+       (catch java.util.concurrent.TimeoutException x# 
+         (do
+           (future-cancel future#)
+           nil)))))
+
 (defn send-to-riemann [m]
   (let [result-map (into @default-map m)
         events (remove nil? (map to-riemann-event result-map))]
     (when @riemann-conn
-      (try
-        (r/send-events @riemann-conn events)
-        (catch Exception e
-          (log/error e))))))
+      (with-timeout 1000 (r/send-events @riemann-conn events)))))
 
 
 (defn reset-accumulators! []
