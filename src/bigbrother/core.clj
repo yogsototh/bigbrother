@@ -1,5 +1,24 @@
 (ns bigbrother.core
-  "This file provide helpers to manage time spend in functions"
+  "This file provide helpers to manage time spend in functions
+
+## Concepts
+
+ You count the time between a start and an end time.
+Typically:
+
+```
+start
+action1
+log action1 finished
+action2
+log action2 finished
+action1
+log action1 finished
+action3
+log action3 finished
+end
+```
+"
   (:require [clojure.tools.logging :as log]
             [clojure.data.json :as json]
             [overtone.at-at :refer [every mk-pool]]
@@ -29,6 +48,7 @@
 (def log-mmetric max-metrics/log-mmetric)
 
 (defn timer-loop-finished
+  "The loop is finished"
   ([]
    ;; increment the number of loop
    (swap! n inc)
@@ -77,22 +97,26 @@
 (defn ok [] (fn [_] "ok"))
 (defn warning [] (fn [_] "warning"))
 (defn critical [] (fn [_] "critical"))
+(defn informational [] (fn [_] "informational"))
 
 (defn- to-riemann-event [[k v]]
   (when (number? v)
     (let [lvl-fn (get @level-by-key k)
-          level  (if lvl-fn (lvl-fn v) "ok")]
+          level  (if lvl-fn (lvl-fn v) "informational")]
       (into
         @riemann-conf
         {:service (str @riemann-service " " (name k))
-         :state level 
+         :state level
          :metric v}))))
 
 (defn send-to-riemann [m]
   (let [result-map (into @default-map m)
         events (remove nil? (map to-riemann-event result-map))]
     (when @riemann-conn
-      (r/send-events @riemann-conn events))))
+      (try
+        (r/send-events @riemann-conn events)
+        (catch Exception e
+          (log/error e))))))
 
 
 (defn reset-accumulators! []

@@ -27,11 +27,16 @@
       (log-time session :end)
       (telescreen-off session)
       (end-session! session))
-    (let [result (resume-map 1000)]
+    (let [result (resume-map 1000)
+          result2 (resume-map 2000)
+          ]
       (is (contains? result :nb))
       (is (contains? result :x1))
       (is (contains? result :x2))
-      (is (>= (:total result) (:x2 result))))))
+      (is (= (:x1 result) (:x1 result2)))
+      (is (= (:x2 result) (:x2 result2)))
+      (is (>= (:total result) (:x2 result)))
+      (is (= (/ (:nb result) 2) (:nb result2))))))
 
 (deftest check-metrics
   (do
@@ -46,13 +51,16 @@
     (log-metric :foo 3)
     (log-metric :bar 1)
     (timer-loop-finished)
-    (let [result (resume-map 1000)]
+    (let [result (resume-map 1000)
+          result2 (resume-map 2000)
+          ]
       (is (contains? result :foo))
       (is (contains? result :bar))
       (is (contains? result :nb))
       (is (= 2.0 (:foo result)))
       (is (= 2.0 (:bar result)))
-      (is (= 3.0 (:nb result))))))
+      (is (= 3.0 (:nb result)))
+      (is (= (/ (:nb result) 2) (:nb result2))))))
 
 (deftest check-mmetrics
   (do
@@ -66,12 +74,16 @@
     (log-mmetric :foo 60)
     (log-mmetric :bar 6)
     (timer-loop-finished)
-    (let [result (resume-map 1000)]
+    (let [result (resume-map 1000)
+          result2 (resume-map 2000)
+          ]
       (is (contains? result :foo))
       (is (contains? result :bar))
       (is (contains? result :nb))
       (is (= 80 (:foo result)))
+      (is (= (:foo result) (:foo result2)))
       (is (= 6  (:bar result)))
+      (is (= (:bar result)  (:bar result2)))
       (is (= 3.0 (:nb result))))))
 
 (deftest check-counters
