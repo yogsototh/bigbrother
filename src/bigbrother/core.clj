@@ -150,15 +150,27 @@ end
 (defn display-time
   "display the time at most every 10s"
   [nb-ms]
-  (let [result (resume-map nb-ms)]
-    (log/info (json/write-str result))
-    (send-to-riemann result)
-    (reset-accumulators!)))
+  (try
+    (let [result (resume-map nb-ms)]
+      (log/info (json/write-str result))
+      (send-to-riemann result)
+      (reset-accumulators!))
+    (catch Throwable t
+      (log/error t)
+      ; (.printStackTrace t)
+      )))
+
+(defn protected [f]
+  (try (f)
+       (catch Throwable t
+         (log/error t)
+         ; (.printStackTrace t)
+         (protected f))))
 
 (defn init-metrics
   "## init-metrics
 
-    init-map :: Map Keyword (v -> ERROR_LEVEL)"
+  init-map :: Map Keyword (v -> ERROR_LEVEL)"
   [init-map nb-ms-metrics riemann-host riemann-service-name riemann-default]
   (reset! default-map (reduce into {}
                               (map (fn [k] {k -1} )
@@ -169,4 +181,5 @@ end
   (reset! riemann-service riemann-service-name)
   (when riemann-host
     (reset! riemann-conn (r/tcp-client {:host riemann-host})))
-  (every nb-ms-metrics (fn [] (display-time nb-ms-metrics)) @pool))
+  (protected
+   #(every nb-ms-metrics (fn [] (display-time nb-ms-metrics)) @pool)))

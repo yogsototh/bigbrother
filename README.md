@@ -159,6 +159,11 @@ Sometime you might want to get the maximum of some values during an interval of 
 
 That will display `{:foo 5}` in the resume.
 
+## Open Issue
+
+Sending a really huge number of timer events could lead to a stack overflow.
+Just add more size to your stack `-Xss16m`.
+
 ## License
 
 Copyright © 2015 Yann Esposito
