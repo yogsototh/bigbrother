@@ -16,7 +16,7 @@
 (defn add-sumtimes [st st2]
   (cond (empty? st) st2
         (empty? st2) st
-        :else (map add-one-sumtime st st2)))
+        :else (doall (map add-one-sumtime st st2))))
 (defn fmap-sumtimes [f st]
   (map (fn [v] [(first v) [(f (ts-timespent v))
                            (ts-nb v)]]) st))
