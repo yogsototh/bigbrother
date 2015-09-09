@@ -7,7 +7,7 @@ It could send the metrics to [Riemann](http://riemann.io).
 Add this dependency to your `project.clj`:
 
 ~~~
-[bigbrother "0.1.0"]
+[bigbrother "0.1.4.2"]
 ~~~
 
 ## Usage
