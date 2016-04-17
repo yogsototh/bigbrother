@@ -3,12 +3,13 @@
 # Big Brother
 
 A Clojure library designed to monitor things and retrieve some metrics.
-
 It could send the metrics to [Riemann](http://riemann.io).
+
+## Install
 
 Add this dependency to your `project.clj`:
 
-[![Clojars Project](http://clojars.org/prismatic/schema/latest-version.svg)](http://clojars.org/yogsototh/bigbrother)
+[![Clojars Project](http://clojars.org/bigbrother/latest-version.svg)](http://clojars.org/bigbrother)
 
 ## Usage
 
