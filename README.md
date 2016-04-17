@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/yogsototh/bigbrother.svg?branch=master)](https://travis-ci.org/yogsototh/bigbrother)
+
 # Big Brother
 
 A Clojure library designed to monitor things and retrieve some metrics.
@@ -6,9 +8,7 @@ It could send the metrics to [Riemann](http://riemann.io).
 
 Add this dependency to your `project.clj`:
 
-~~~
-[bigbrother "0.1.4.2"]
-~~~
+[![Clojars Project](http://clojars.org/prismatic/schema/latest-version.svg)](http://clojars.org/yogsototh/bigbrother)
 
 ## Usage
 
